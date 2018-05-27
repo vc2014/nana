@@ -14,7 +14,7 @@ class ConfigBuilder:
     def __init__(self, str):
         print("Inside the ConfigBuilder constructor")
         self.application = str
-        self.dictionary = []
+        self.dictionary = {}
     # Two methods:
     def show(self):
         print(self.application)
@@ -35,7 +35,7 @@ class ConfigBuilder:
         
         return config_parser
             
-    def showConfiguration(self):
+    def buildConfiguration(self):
         
         config_parser = self.getConfiguration()
         for section_name in config_parser.sections():
@@ -43,7 +43,6 @@ class ConfigBuilder:
             print('  Options:', config_parser.options(section_name))
             module=[]
             classes=[]
-            instances=[]
             for key, value in config_parser.items(section_name):
                 print('{} = {}'.format(key, value))
                 if(key=='pkg'):
@@ -58,12 +57,24 @@ class ConfigBuilder:
                     j=0
                     for val in values:
                         classes.insert(len(classes), getattr(module[j], val))
-                        instances.insert(len(instances), classes[j]('base'))
+                        #instances.insert(len(instances), classes[j]('base'))
+                        #self.dictionary[val] = getattr(module[j], val)
+                        self.dictionary[val] = getattr(module[j], val)('base')
                         j=j+1
                     
                     
             print()
-
+            
+    def showConfiguration(self):
+        
+        config_parser = self.getConfiguration()
+        for section_name in config_parser.sections():
+            print('Section:', section_name)
+            print('  Options:', config_parser.options(section_name))
+            for key, value in config_parser.items(section_name):
+                print('{} = {}'.format(key, value))
+            print()
+            
 
 if __name__ == "__main__":
     # Create an object:
@@ -71,4 +82,7 @@ if __name__ == "__main__":
     x.show()
     x.showMsg("A message")
     x.showConfiguration()
+    x.buildConfiguration()
+    instance = x.dictionary.get('Cluster')('base')
+    instance.sayHello()
     
